@@ -68,17 +68,28 @@ process.on('uncaughtException', (err) => {
   console.log(err);
 });*/
 
-const mymime = require('./mymime')
+const path = require('path');
+const mymime = require('./mymine');
 
 var server = http.createServer((req, res) => {
   console.log('req.url: ', req.url);
   if (req.url === '/') {
     req.url = '/index.html';
-
-    var filename = __dirname = req.url;
-    var extension = path.extname(filename).substring(1);
-    console.log(extension);
   }
+
+  var filename = __dirname + req.url;
+  var extension = path.extname(filename).substring(1);
+  console.log(extension);
+  fs.readFile(filename, (err, data) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    res.writeHead(200, {
+      'Content-Type': mymime[extension]
+    });
+    res.end(data);
+  });
 }).listen(1337, _ => {
   console.log(1337);
 });
