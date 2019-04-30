@@ -69,6 +69,7 @@ process.on('uncaughtException', (err) => {
 });*/
 
 const path = require('path');
+const mime = require('mime');
 const mymime = require('./mymine');
 
 var server = http.createServer((req, res) => {
@@ -77,10 +78,17 @@ var server = http.createServer((req, res) => {
     req.url = '/index.html';
   }
 
+  if (req.url === '/favicon.ico') {
+    res.statusCode = 404;
+    res.end();
+    return;
+  }
+
   var filename = __dirname + req.url;
-  var extension = path.extname(filename).substring(1);
-  console.log(extension);
-  fs.readFile(filename, (err, data) => {
+  // var extension = path.extname(filename).substring(1);
+  // console.log(extension);
+
+  /*fs.readFile(filename, (err, data) => {
     if (err) {
       console.log(err);
       return;
@@ -89,6 +97,22 @@ var server = http.createServer((req, res) => {
       'Content-Type': mymime[extension]
     });
     res.end(data);
+  });*/
+
+
+  fs.open(filename, 'r', (err) => {
+    if (err) {
+      res.writeHead(404, {
+        'Content-Type': 'text/html; charset=utf-8'
+      });
+      res.end(`<h1>File Not Found</h1>
+               <p>${err.message}</p>`);
+    } else {
+      res.writeHead(200, {
+        'Content-Type': mime.getType(filename)
+      });
+      fs.createReadStream(filename).pipe(res);
+    }
   });
 }).listen(1337, _ => {
   console.log(1337);
