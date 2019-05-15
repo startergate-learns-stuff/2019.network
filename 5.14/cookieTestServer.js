@@ -25,7 +25,7 @@ const qs = require('querystring');
 const url = require('url');
 
 var server = http.createServer((req, res) => {
-  var cookies;
+  var cookies = {};
   if (req.headers.cookie !== undefined) {
     cookies = cookie.parse(req.headers.cookie);
     console.log(cookies);
@@ -43,7 +43,7 @@ var server = http.createServer((req, res) => {
   }
 
   if (cookies.name) {
-    res.end(`welcome, ${cookies.name}`)
+    res.end(`welcome, ${cookies.name}`);
     return;
   }
 
