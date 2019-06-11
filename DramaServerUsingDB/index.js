@@ -1,12 +1,15 @@
 /*jshint esversion: 9 */
 
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
 const logger = require('morgan');
+const favicon = require('serve-favicon');
+const path = require('path');
+
+const dramaRouter = require("./routes/drama");
 
 var app = express();
-var db = new sqlite3.Database("dramaList.db");
 
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(express.static('public'));
 app.use(express.urlencoded({
@@ -16,30 +19,12 @@ app.use(express.urlencoded({
 app.set('view engine', 'pug');
 app.set('views', './views');
 
-app.get('/', (req, res) => {
-  db.all(`SELECT * FROM drama`, (err, rows) => {
-    if (err) {
-      console.log(err.message);
-      return;
-    }
-    res.render('dramaList', {
-      list: rows
-    });
-  });
-});
+// app.all('/', (req, res) => {
+//   res.redirect("/index.html");
+// });
+app.use('/drama', dramaRouter);
+// app.use('/movie', movieRouter);
 
-app.post('/', (req, res) => {
-  if (req.body.title && req.body.actor) {
-    db.run(`INSERT INTO drama (title, actor) VALUES ($title, $actor)`, {
-      $title: req.body.title,
-      $actor: req.body.actor
-    }, err => {
-      console.log(err);
-    });
-  }
-  res.redirect('/');
-});
-
-app.listen(8080, _ => {
-  console.log(8080);
+app.listen(1337, _ => {
+  console.log(1337);
 });
